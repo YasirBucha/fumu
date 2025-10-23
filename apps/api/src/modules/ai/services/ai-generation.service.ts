@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { OpenAIService } from './openai.service';
 import { RunwayService } from './runway.service';
 import { GoogleVeoService } from './google-veo.service';
+import { CharactersService } from '../../characters/characters.service';
 
 export interface GenerationRequest {
   prompt: string;
@@ -12,6 +13,8 @@ export interface GenerationRequest {
   duration?: number;
   resolution?: string;
   quality?: string;
+  characterId?: string;
+  maintainCharacter?: boolean;
 }
 
 export interface GenerationResponse {
@@ -31,23 +34,35 @@ export class AIGenerationService {
     private openaiService: OpenAIService,
     private runwayService: RunwayService,
     private googleVeoService: GoogleVeoService,
+    private charactersService: CharactersService,
   ) {}
 
   async generateTextToImage(request: GenerationRequest, userId: string): Promise<GenerationResponse> {
     try {
+      // Enhance prompt with character consistency if characterId is provided
+      let enhancedPrompt = request.prompt;
+      if (request.characterId && request.maintainCharacter) {
+        const characterPrompt = await this.charactersService.generateCharacterPrompt(
+          request.characterId,
+          request.prompt,
+          userId
+        );
+        enhancedPrompt = characterPrompt.characterPrompt;
+      }
+
       // Create generation job record
       const job = await this.prisma.generationJob.create({
         data: {
           userId,
           type: 'image',
           status: 'processing',
-          input: request,
+          input: { ...request, prompt: enhancedPrompt },
         },
       });
 
       // Generate image using OpenAI
       const result = await this.openaiService.generateImage(
-        request.prompt,
+        enhancedPrompt,
         request.resolution || '1024x1024',
         request.quality || 'standard'
       );
@@ -231,5 +246,90 @@ export class AIGenerationService {
       orderBy: { createdAt: 'desc' },
       take: limit,
     });
+  }
+
+  async generateSceneWithCharacter(
+    scenePrompt: string,
+    characterId: string,
+    projectId: string,
+    userId: string,
+    options: {
+      model?: string;
+      duration?: number;
+      resolution?: string;
+      quality?: string;
+    } = {}
+  ) {
+    try {
+      // Get character information
+      const character = await this.charactersService.getCharacterById(characterId, userId);
+      
+      // Generate enhanced prompt with character consistency
+      const characterPrompt = await this.charactersService.generateCharacterPrompt(
+        characterId,
+        scenePrompt,
+        userId
+      );
+
+      // Generate image first
+      const imageResult = await this.generateTextToImage({
+        prompt: characterPrompt.characterPrompt,
+        model: options.model || 'openai',
+        resolution: options.resolution || '1024x1024',
+        quality: options.quality || 'standard',
+        characterId,
+        maintainCharacter: true,
+      }, userId);
+
+      if (!imageResult.success || !imageResult.imageUrl) {
+        return {
+          success: false,
+          error: 'Failed to generate character image',
+        };
+      }
+
+      // Generate video from image
+      const videoResult = await this.generateImageToVideo({
+        imageUrl: imageResult.imageUrl,
+        prompt: characterPrompt.characterPrompt,
+        model: options.model || 'runway',
+        duration: options.duration || 4,
+        resolution: options.resolution || '1280x720',
+        characterId,
+        maintainCharacter: true,
+      }, userId);
+
+      // Create scene record
+      const scene = await this.prisma.scene.create({
+        data: {
+          projectId,
+          prompt: scenePrompt,
+          imageUrl: imageResult.imageUrl,
+          videoUrl: videoResult.success ? videoResult.videoUrl : null,
+          status: videoResult.success ? 'completed' : 'failed',
+          aiModel: options.model || 'runway',
+          metadata: {
+            characterId,
+            characterName: character.name,
+            characterSeed: character.seed,
+            generationJobId: videoResult.jobId,
+          },
+        },
+      });
+
+      return {
+        success: true,
+        scene,
+        imageResult,
+        videoResult,
+        characterPrompt,
+      };
+    } catch (error) {
+      console.error('Character-aware scene generation error:', error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   }
 }

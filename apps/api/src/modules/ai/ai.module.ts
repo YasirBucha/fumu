@@ -4,8 +4,10 @@ import { AIGenerationService } from './services/ai-generation.service';
 import { OpenAIService } from './services/openai.service';
 import { RunwayService } from './services/runway.service';
 import { GoogleVeoService } from './services/google-veo.service';
+import { CharactersModule } from '../characters/characters.module';
 
 @Module({
+  imports: [CharactersModule],
   controllers: [AIGenerationController],
   providers: [AIGenerationService, OpenAIService, RunwayService, GoogleVeoService],
   exports: [AIGenerationService],

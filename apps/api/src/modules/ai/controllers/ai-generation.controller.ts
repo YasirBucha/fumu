@@ -66,6 +66,34 @@ export class AIGenerationController {
     return this.aiGenerationService.getUserGenerationHistory(userId, limit);
   }
 
+  @Post('scene-with-character')
+  async generateSceneWithCharacter(
+    @Body() body: {
+      scenePrompt: string;
+      characterId: string;
+      projectId: string;
+      model?: string;
+      duration?: number;
+      resolution?: string;
+      quality?: string;
+    },
+    @Request() req: any
+  ) {
+    const userId = req.user.sub; // Clerk user ID
+    return this.aiGenerationService.generateSceneWithCharacter(
+      body.scenePrompt,
+      body.characterId,
+      body.projectId,
+      userId,
+      {
+        model: body.model,
+        duration: body.duration,
+        resolution: body.resolution,
+        quality: body.quality,
+      }
+    );
+  }
+
   @Get('models')
   async getAvailableModels() {
     return {
