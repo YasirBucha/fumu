@@ -105,11 +105,11 @@ export class VideoService {
                     userId,
                     type: 'video',
                     status: 'processing',
-          input: JSON.stringify({
-            projectId,
-            sceneCount: project.scenes.length,
-            options,
-          }),
+                    input: JSON.stringify({
+                        projectId,
+                        sceneCount: project.scenes.length,
+                        options,
+                    }),
                 },
             });
 
@@ -363,8 +363,8 @@ export class VideoService {
 
             return {
                 status: job.status,
-        videoUrl: job.output ? JSON.parse(job.output).videoUrl : undefined,
-        error: job.error || undefined,
+                videoUrl: job.output ? JSON.parse(job.output).videoUrl : undefined,
+                error: job.error || undefined,
             };
         } catch (error) {
             this.logger.error('Error getting processing status:', error);
