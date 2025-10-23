@@ -1,0 +1,114 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  avatar        String?
+  provider      String    // 'email', 'google', 'apple'
+  providerId    String?   // External provider ID
+  subscription  String    @default("free") // 'free', 'pro', 'enterprise'
+  projects      Project[]
+  characters    Character[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Project {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  thumbnail     String?
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  scenes        Scene[]
+  characters    Character[]
+  settings      Json?     // Project-specific settings
+  isPublic      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("projects")
+}
+
+model Scene {
+  id            String    @id @default(cuid())
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId     String
+  order         Int
+  title         String?
+  prompt        String
+  imageUrl      String?
+  videoUrl      String?
+  thumbnail     String?
+  duration      Float?    // Duration in seconds
+  status        String    @default("pending") // 'pending', 'processing', 'completed', 'failed'
+  aiModel       String    // Which AI model was used
+  metadata      Json?     // Additional scene metadata
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("scenes")
+}
+
+model Character {
+  id            String    @id @default(cuid())
+  name          String
+  description   String?
+  seed          String    // Character seed for consistency
+  embedding     Json?     // Character embedding data
+  imageUrl      String?   // Character reference image
+  project       Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId     String?
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  isLocked      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("characters")
+}
+
+model AIModel {
+  id            String    @id @default(cuid())
+  name          String    @unique
+  provider      String    // 'openai', 'google', 'runway', etc.
+  type          String    // 'text-to-image', 'image-to-video', 'video-extension'
+  endpoint      String
+  apiKey        String?   // Encrypted API key
+  isActive      Boolean   @default(true)
+  costPerToken  Float?    // Cost tracking
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("ai_models")
+}
+
+model GenerationJob {
+  id            String    @id @default(cuid())
+  userId        String
+  projectId     String?
+  sceneId       String?
+  type          String    // 'image', 'video', 'extension', 'merge'
+  status        String    @default("queued") // 'queued', 'processing', 'completed', 'failed'
+  input         Json      // Input parameters
+  output        Json?     // Output URLs and metadata
+  error         String?   // Error message if failed
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@map("generation_jobs")
+}
