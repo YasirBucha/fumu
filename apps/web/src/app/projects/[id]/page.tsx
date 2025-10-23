@@ -35,7 +35,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 🎬 FuMu
               </Link>
               <nav className="hidden md:flex space-x-6">
-                <.getLink href="/dashboard" className="text-gray-700 hover:text-blue-600 font-medium">
+                <Link href="/dashboard" className="text-gray-700 hover:text-blue-600 font-medium">
                   Dashboard
                 </Link>
                 <Link href="/projects" className="text-gray-700 hover:text-blue-600 font-medium">
@@ -181,9 +181,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Export Movie</h2>
             <p className="text-gray-600 mb-4">Ready to create your final movie? Export all scenes into a single video file.</p>
-            <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
-              Export Movie
-            </button>
+            <Link href={`/projects/${params.id}/export`}>
+              <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                Export Movie
+              </button>
+            </Link>
           </div>
         )}
       </main>
