@@ -41,8 +41,27 @@ export class VideoService {
     constructor(public prisma: PrismaService) {
         // Set FFmpeg path
         if (ffmpegStatic) {
-            ffmpeg.setFfmpegPath(ffmpegStatic);
+            // Handle both string and object formats from ffmpeg-static
+            const ffmpegPath = typeof ffmpegStatic === 'string' ? ffmpegStatic : ffmpegStatic.default || ffmpegStatic;
+            ffmpeg.setFfmpegPath(ffmpegPath);
         }
+    }
+
+    /**
+     * Test FFmpeg availability
+     */
+    async testFFmpeg(): Promise<boolean> {
+        return new Promise((resolve) => {
+            ffmpeg.getAvailableFormats((err, formats) => {
+                if (err) {
+                    this.logger.error('FFmpeg test failed:', err);
+                    resolve(false);
+                } else {
+                    this.logger.log('FFmpeg is available and working');
+                    resolve(true);
+                }
+            });
+        });
     }
 
     /**
