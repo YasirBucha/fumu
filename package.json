@@ -19,7 +19,14 @@
         "db:studio": "cd apps/api && npx prisma studio",
         "db:generate": "cd apps/api && npx prisma generate",
         "db:push": "cd apps/api && npx prisma db push",
-        "setup:db": "./scripts/setup-database.sh"
+        "setup:db": "./scripts/setup-database.sh",
+        "setup:production": "./scripts/setup-production.sh",
+        "quick-start": "./scripts/quick-start.sh",
+        "docker:up": "docker-compose up -d",
+        "docker:down": "docker-compose down",
+        "docker:logs": "docker-compose logs -f",
+        "docker:build": "docker-compose build",
+        "health": "curl -f http://localhost:3001/health || echo 'API not running'"
     },
     "devDependencies": {
         "@turbo/gen": "^1.10.12",

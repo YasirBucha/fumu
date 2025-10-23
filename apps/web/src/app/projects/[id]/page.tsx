@@ -10,7 +10,7 @@ interface ProjectPageProps {
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { userId } = await auth()
-  
+
   if (!userId) {
     redirect('/')
   }
@@ -80,7 +80,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center">
               <div className="p-2 bg-green-100 rounded-lg">
@@ -92,7 +92,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center">
               <div className="p-2 bg-yellow-100 rounded-lg">
@@ -104,7 +104,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center">
               <div className="p-2 bg-purple-100 rounded-lg">
@@ -128,7 +128,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </button>
             </Link>
           </div>
-          
+
           {project.scenes.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🎬</div>
@@ -155,12 +155,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        scene.status === 'completed' ? 'bg-green-100 text-green-800' :
-                        scene.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                        scene.status === 'failed' ? 'bg-red-100 text-red-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${scene.status === 'completed' ? 'bg-green-100 text-green-800' :
+                          scene.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                            scene.status === 'failed' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                        }`}>
                         {scene.status}
                       </span>
                       <button className="text-gray-400 hover:text-gray-600">

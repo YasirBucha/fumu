@@ -5,9 +5,9 @@ import { VideoQueueService } from './queue/video-queue.service';
 import { PrismaModule } from '../../prisma/prisma.module';
 
 @Module({
-  imports: [PrismaModule],
-  controllers: [VideoController],
-  providers: [VideoService, VideoQueueService],
-  exports: [VideoService, VideoQueueService],
+    imports: [PrismaModule],
+    controllers: [VideoController],
+    providers: [VideoService, VideoQueueService],
+    exports: [VideoService, VideoQueueService],
 })
-export class VideoModule {}
+export class VideoModule { }
