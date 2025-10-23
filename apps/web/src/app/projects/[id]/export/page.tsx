@@ -129,12 +129,12 @@ export default function VideoExportPage() {
                     const data = await response.json();
                     const status = data.data;
 
-                    setExportJob(prev => ({
+                    setExportJob(prev => prev ? {
                         ...prev,
                         status: status.status,
                         videoUrl: status.videoUrl,
                         error: status.error,
-                    }));
+                    } : null);
 
                     if (status.status === 'completed' || status.status === 'failed') {
                         clearInterval(pollInterval);
@@ -401,10 +401,10 @@ export default function VideoExportPage() {
                         ) : (
                             <button
                                 onClick={handleExport}
-                                disabled={exporting || (exportJob && exportJob.status === 'processing')}
+                                disabled={exporting || (exportJob?.status === 'processing')}
                                 className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {exporting || (exportJob && exportJob.status === 'processing') ? (
+                                {exporting || (exportJob?.status === 'processing') ? (
                                     <span className="flex items-center">
                                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                                         Processing...

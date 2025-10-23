@@ -1,5 +1,14 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
+const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+const clerkSecretKey = process.env.CLERK_SECRET_KEY
+
+if (!clerkPublishableKey || !clerkSecretKey) {
+    throw new Error(
+        'Missing Clerk environment variables. Please set NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY.',
+    )
+}
+
 const isProtectedRoute = createRouteMatcher([
     '/dashboard(.*)',
     '/projects(.*)',
@@ -7,9 +16,18 @@ const isProtectedRoute = createRouteMatcher([
     '/settings(.*)',
 ])
 
-export default clerkMiddleware((auth, req) => {
-    if (isProtectedRoute(req)) auth().protect()
-})
+export default clerkMiddleware(
+    async (auth, req) => {
+        if (isProtectedRoute(req)) {
+            await auth.protect()
+        }
+    },
+    {
+        publishableKey: clerkPublishableKey,
+        secretKey: clerkSecretKey,
+        debug: process.env.NODE_ENV === 'development',
+    },
+)
 
 export const config = {
     matcher: [

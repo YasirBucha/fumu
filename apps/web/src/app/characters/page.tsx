@@ -4,13 +4,13 @@ import Link from 'next/link'
 
 export default async function Characters() {
   const { userId } = await auth()
-  
+
   if (!userId) {
     redirect('/')
   }
 
   // TODO: Fetch characters from API
-  const characters = []
+  const characters: any[] = []
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -68,7 +68,7 @@ export default async function Characters() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center">
               <div className="p-2 bg-green-100 rounded-lg">
@@ -80,7 +80,7 @@ export default async function Characters() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -92,7 +92,7 @@ export default async function Characters() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center">
               <div className="p-2 bg-orange-100 rounded-lg">
@@ -125,8 +125,8 @@ export default async function Characters() {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center space-x-3">
                     {character.imageUrl ? (
-                      <img 
-                        src={character.imageUrl} 
+                      <img
+                        src={character.imageUrl}
                         alt={character.name}
                         className="w-12 h-12 rounded-full object-cover"
                       />
@@ -150,16 +150,16 @@ export default async function Characters() {
                     </svg>
                   </button>
                 </div>
-                
+
                 {character.description && (
                   <p className="text-gray-600 mb-4 line-clamp-3">{character.description}</p>
                 )}
-                
+
                 <div className="flex justify-between items-center text-sm text-gray-500 mb-4">
                   <span>Seed: {character.seed}</span>
                   <span>{new Date(character.createdAt).toLocaleDateString()}</span>
                 </div>
-                
+
                 <div className="flex space-x-2">
                   <Link href={`/characters/${character.id}`}>
                     <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">

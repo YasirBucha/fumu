@@ -10,7 +10,7 @@ export default async function Projects() {
     }
 
     // TODO: Fetch projects from API
-    const projects = []
+    const projects: any[] = []
 
     return (
         <div className="min-h-screen bg-gray-50">
