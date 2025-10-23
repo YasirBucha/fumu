@@ -21,11 +21,13 @@ export default function Home() {
             <h1 className="text-3xl font-bold gradient-text">FuMu</h1>
           </div>
           <div className="flex items-center space-x-4">
-            <SignInButton mode="modal">
-              <button className="btn-primary">
-                Sign In
-              </button>
-            </SignInButton>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="btn-primary">
+                  Sign In
+                </button>
+              </SignInButton>
+            </SignedOut>
             <SignedIn>
               <UserButton afterSignOutUrl="/" />
             </SignedIn>
