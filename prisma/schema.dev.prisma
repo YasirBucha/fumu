@@ -16,7 +16,7 @@ model User {
   name          String?
   avatar        String?
   provider      String    // 'email', 'google', 'apple'
-  providerId    String?   // External provider ID
+  providerId    String?   @unique // External provider ID
   subscription  String    @default("free") // 'free', 'pro', 'enterprise'
   projects      Project[]
   characters    Character[]

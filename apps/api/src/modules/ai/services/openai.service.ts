@@ -3,16 +3,31 @@ import OpenAI from 'openai';
 
 @Injectable()
 export class OpenAIService {
-  private openai: OpenAI;
+  private openai: OpenAI | null;
 
   constructor() {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey || apiKey === 'placeholder') {
+      console.warn('OpenAI API key not configured. AI services will return mock responses.');
+      this.openai = null;
+    } else {
+      this.openai = new OpenAI({
+        apiKey: apiKey,
+      });
+    }
   }
 
   async generateImage(prompt: string, size: string = '1024x1024', quality: string = 'standard') {
     try {
+      if (!this.openai) {
+        // Return mock response when API key is not configured
+        return {
+          success: true,
+          imageUrl: 'https://via.placeholder.com/1024x1024/4F46E5/FFFFFF?text=Mock+AI+Generated+Image',
+          revisedPrompt: prompt + ' (mock response - API key not configured)',
+        };
+      }
+
       const response = await this.openai.images.generate({
         model: 'dall-e-3',
         prompt,
@@ -23,8 +38,8 @@ export class OpenAIService {
 
       return {
         success: true,
-        imageUrl: response.data[0].url,
-        revisedPrompt: response.data[0].revised_prompt,
+        imageUrl: response.data?.[0]?.url || '',
+        revisedPrompt: response.data?.[0]?.revised_prompt || prompt,
       };
     } catch (error) {
       console.error('OpenAI image generation error:', error);

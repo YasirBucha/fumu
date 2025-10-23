@@ -7,12 +7,27 @@ export class RunwayService {
   private baseUrl: string;
 
   constructor() {
-    this.apiKey = process.env.RUNWAY_API_KEY;
+    const apiKey = process.env.RUNWAY_API_KEY;
+    if (!apiKey || apiKey === 'placeholder') {
+      console.warn('Runway API key not configured. AI services will return mock responses.');
+      this.apiKey = '';
+    } else {
+      this.apiKey = apiKey;
+    }
     this.baseUrl = 'https://api.runwayml.com/v1';
   }
 
   async generateVideoFromImage(imageUrl: string, prompt?: string, duration: number = 4) {
     try {
+      if (!this.apiKey) {
+        // Return mock response when API key is not configured
+        return {
+          success: true,
+          videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
+          jobId: 'mock-job-id',
+        };
+      }
+
       const response = await axios.post(
         `${this.baseUrl}/image_to_video`,
         {

@@ -5,9 +5,10 @@ import { OpenAIService } from './services/openai.service';
 import { RunwayService } from './services/runway.service';
 import { GoogleVeoService } from './services/google-veo.service';
 import { CharactersModule } from '../characters/characters.module';
+import { PrismaModule } from '../../prisma/prisma.module';
 
 @Module({
-  imports: [CharactersModule],
+  imports: [CharactersModule, PrismaModule],
   controllers: [AIGenerationController],
   providers: [AIGenerationService, OpenAIService, RunwayService, GoogleVeoService],
   exports: [AIGenerationService],

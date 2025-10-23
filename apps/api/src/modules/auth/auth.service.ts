@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { clerkClient } from '@clerk/backend';
+import { ClerkClient } from '@clerk/backend';
 
 @Injectable()
 export class AuthService {
@@ -9,7 +9,7 @@ export class AuthService {
     async createOrUpdateUser(clerkUserId: string, email: string, name?: string) {
         try {
             const user = await this.prisma.user.upsert({
-                where: { providerId: clerkUserId },
+                where: { email: email },
                 update: {
                     email,
                     name,
@@ -32,7 +32,7 @@ export class AuthService {
     }
 
     async getUserByClerkId(clerkUserId: string) {
-        return this.prisma.user.findUnique({
+        return this.prisma.user.findFirst({
             where: { providerId: clerkUserId },
         });
     }

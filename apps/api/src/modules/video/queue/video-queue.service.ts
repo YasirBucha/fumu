@@ -107,7 +107,7 @@ export class VideoQueueService {
                     where: { id: jobId },
                     data: {
                         status: 'completed',
-                        output: { videoUrl: result.videoUrl },
+                        output: JSON.stringify({ videoUrl: result.videoUrl }),
                         completedAt: new Date(),
                     },
                 });

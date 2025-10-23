@@ -37,7 +37,10 @@ export class AIGenerationController {
     @Request() req: any
   ) {
     const userId = req.user.sub; // Clerk user ID
-    return this.aiGenerationService.generateImageToVideo(body, userId);
+    return this.aiGenerationService.generateImageToVideo({
+      ...body,
+      prompt: body.prompt || '',
+    }, userId);
   }
 
   @Post('extend-video')

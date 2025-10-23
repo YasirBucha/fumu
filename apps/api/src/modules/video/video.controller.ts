@@ -47,10 +47,10 @@ export class VideoController {
                     userId,
                     type: 'video',
                     status: 'queued',
-                    input: {
-                        projectId: body.projectId,
-                        options: body.options || {},
-                    },
+          input: JSON.stringify({
+            projectId: body.projectId,
+            options: body.options || {},
+          }),
                 },
             });
 

@@ -24,13 +24,13 @@ export class CharactersService {
         userId,
         projectId,
         isLocked: false,
-        embedding: {
+        embedding: JSON.stringify({
           seed,
           name,
           description,
           imageUrl,
           createdAt: new Date().toISOString(),
-        },
+        }),
       },
       include: {
         project: true,
@@ -105,16 +105,16 @@ export class CharactersService {
     if (data.name || data.description) {
       const newSeed = this.generateCharacterSeed(
         data.name || character.name,
-        data.description || character.description
+        data.description || character.description || ''
       );
-      updatedData.seed = newSeed;
-      updatedData.embedding = {
-        ...character.embedding,
+      (updatedData as any).seed = newSeed;
+      updatedData.embedding = JSON.stringify({
+        ...JSON.parse(character.embedding || '{}'),
         seed: newSeed,
         name: data.name || character.name,
         description: data.description || character.description,
         updatedAt: new Date().toISOString(),
-      };
+      });
     }
 
     return this.prisma.character.update({
@@ -213,16 +213,12 @@ export class CharactersService {
   async getCharacterUsageStats(characterId: string, userId: string) {
     const character = await this.getCharacterById(characterId, userId);
     
-    // Count scenes that use this character
+    // Count scenes that use this character (simplified for SQLite)
     const scenes = await this.prisma.scene.findMany({
       where: {
         metadata: {
-          path: ['characterId'],
-          equals: characterId,
+          contains: characterId,
         },
-      },
-      include: {
-        project: true,
       },
     });
 
@@ -230,7 +226,7 @@ export class CharactersService {
       characterId,
       characterName: character.name,
       totalScenes: scenes.length,
-      projects: [...new Set(scenes.map(s => s.project.title))],
+      projects: [...new Set(scenes.map(s => s.projectId))],
       lastUsed: scenes.length > 0 ? Math.max(...scenes.map(s => new Date(s.createdAt).getTime())) : null,
     };
   }

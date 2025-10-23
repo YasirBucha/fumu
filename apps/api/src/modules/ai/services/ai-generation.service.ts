@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { OpenAIService } from './openai.service';
 import { RunwayService } from './runway.service';
 import { GoogleVeoService } from './google-veo.service';
@@ -56,7 +56,7 @@ export class AIGenerationService {
           userId,
           type: 'image',
           status: 'processing',
-          input: { ...request, prompt: enhancedPrompt },
+          input: JSON.stringify({ ...request, prompt: enhancedPrompt }),
         },
       });
 
@@ -72,7 +72,7 @@ export class AIGenerationService {
         where: { id: job.id },
         data: {
           status: result.success ? 'completed' : 'failed',
-          output: result,
+          output: JSON.stringify(result),
           error: result.error,
           completedAt: new Date(),
         },
@@ -103,7 +103,7 @@ export class AIGenerationService {
           userId,
           type: 'video',
           status: 'processing',
-          input: request,
+          input: JSON.stringify(request),
         },
       });
 
@@ -139,7 +139,7 @@ export class AIGenerationService {
         where: { id: job.id },
         data: {
           status: result.success ? 'completed' : 'failed',
-          output: result,
+          output: JSON.stringify(result),
           error: result.error,
           completedAt: new Date(),
         },
@@ -170,7 +170,7 @@ export class AIGenerationService {
           userId,
           type: 'extension',
           status: 'processing',
-          input: request,
+          input: JSON.stringify(request),
         },
       });
 
@@ -206,7 +206,7 @@ export class AIGenerationService {
         where: { id: job.id },
         data: {
           status: result.success ? 'completed' : 'failed',
-          output: result,
+          output: JSON.stringify(result),
           error: result.error,
           completedAt: new Date(),
         },
@@ -303,17 +303,18 @@ export class AIGenerationService {
       const scene = await this.prisma.scene.create({
         data: {
           projectId,
+          order: 1, // Default order for new scenes
           prompt: scenePrompt,
           imageUrl: imageResult.imageUrl,
           videoUrl: videoResult.success ? videoResult.videoUrl : null,
           status: videoResult.success ? 'completed' : 'failed',
           aiModel: options.model || 'runway',
-          metadata: {
+          metadata: JSON.stringify({
             characterId,
             characterName: character.name,
             characterSeed: character.seed,
             generationJobId: videoResult.jobId,
-          },
+          }),
         },
       });
 
